@@ -73,7 +73,7 @@ public sealed class Input
     public bool WasReleased(string action)
     {
         // TODO 6.4 (a): după modelul lui WasPressed, cu IsKeyReleased și IsButtonReleased.
-        return false;   // provizoriu
+        return AnyKey(action, k => _keyboard!.IsKeyReleased(k)) || AnyButton(action, b => _mouse!.IsButtonReleased(b));
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public sealed class Input
     public float Axis(string negative, string positive)
     {
         // TODO 6.4 (b): (positive ținută ? 1 : 0) - (negative ținută ? 1 : 0)
-        return 0.0f;   // provizoriu
+        return (IsDown(positive) ? 1.0f : 0.0f) - (IsDown(negative) ? 1.0f : 0.0f);
     }
 
     // --- Mouse ----------------------------------------------------------------------------
