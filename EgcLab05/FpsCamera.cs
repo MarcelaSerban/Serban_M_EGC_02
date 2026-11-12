@@ -22,7 +22,7 @@ public class FpsCamera : Camera
     /// <summary>Tangajul (pitch), în grade: rotația sus-jos. Limitat la ±MaxPitch.</summary>
     public float Pitch { get; private set; }
 
-    /// <summary>Zbor liber (true) sau mers pe sol (false). Comutat cu tasta G (facultativ, TODO 5.7).</summary>
+    /// <summary>Zbor liber (true) sau mers pe sol (false). Comutat cu tasta G.</summary>
     public bool FreeFly { get; set; }
 
     // Baza camerei: trei vectori unitate, perpendiculari doi câte doi (secțiunea 5).
@@ -60,7 +60,6 @@ public class FpsCamera : Camera
     {
         // --- 1. Orientarea: mouse-ul modifică yaw și pitch -------------------------
 
-        // TODO 5.5 (a): deplasarea pe orizontală modifică yaw, cea pe verticală modifică pitch.
         Yaw += mouseDelta.X * MouseSensitivity;
         Pitch -= mouseDelta.Y * MouseSensitivity;   // pe ecran Y crește în jos => semn schimbat
         Pitch = Math.Clamp(Pitch, -MaxPitch, MaxPitch);
@@ -70,7 +69,6 @@ public class FpsCamera : Camera
 
         // --- 2. FOV: rotița mouse-ului --------------------------------------------
 
-        // TODO 5.1 (c): rotița în sus (ScrollDelta.Y > 0) micșorează FOV-ul (efect de zoom)
         if (mouse.ScrollDelta.Y != 0.0f)
         {
             ChangeFov(-mouse.ScrollDelta.Y * FovStep);   // rotița în sus => FOV mai mic (zoom)
@@ -79,16 +77,19 @@ public class FpsCamera : Camera
 
         // --- 3. Deplasarea: W A S D ---------------------------------------------------
 
-        // TODO 5.6: deplasarea cu W A S D, independentă de numărul de cadre pe secundă.
-        // (1) direcția "înainte": Front proiectat pe planul orizontal
-        Vector3 forward = new Vector3(_front.X, 0.0f, _front.Z);
-        if (forward.LengthSquared > 1e-6f)
+        // (1) direcția "înainte": în zbor liber chiar Front; în modul mers, Front proiectat pe orizontală
+        Vector3 forward = _front;
+        if (!FreeFly)
         {
-            forward.Normalize();
-        }
-        else
-        {
-            forward = Vector3.Zero;   // privire verticală: nu avem direcție orizontală
+            forward = new Vector3(_front.X, 0.0f, _front.Z);
+            if (forward.LengthSquared > 1e-6f)
+            {
+                forward.Normalize();
+            }
+            else
+            {
+                forward = Vector3.Zero;   // privire verticală: nu avem direcție orizontală
+            }
         }
 
         // (2) suma direcțiilor tastelor apăsate
@@ -98,18 +99,22 @@ public class FpsCamera : Camera
         if (keyboard.IsKeyDown(Keys.D)) move += _right;
         if (keyboard.IsKeyDown(Keys.A)) move -= _right;
 
+        // zbor liber: Space urcă, Ctrl stânga coboară
+        if (FreeFly)
+        {
+            if (keyboard.IsKeyDown(Keys.Space)) move += WorldUp;
+            if (keyboard.IsKeyDown(Keys.LeftControl)) move -= WorldUp;
+        }
+
         // (3) normalizare: pe diagonală nu se merge mai repede
         if (move.LengthSquared > 1e-6f)
         {
             move.Normalize();
 
-            // (4) poziția += direcție · viteză · dt (Shift stânga: SprintFactor ori mai repede)
+            // (4) poziția += direcție · viteză · dt
             float speed = MoveSpeed * (keyboard.IsKeyDown(Keys.LeftShift) ? SprintFactor : 1.0f);
             _position += move * speed * dt;
         }
-
-        // TODO 5.7 (facultativ): în zbor liber (FreeFly), "forward" este chiar _front,
-        //           iar Space urcă și Ctrl stânga coboară (pe axa Y a lumii, WorldUp).
     }
 
     /// <summary>
@@ -117,7 +122,6 @@ public class FpsCamera : Camera
     /// </summary>
     private void UpdateVectors()
     {
-        // TODO 5.5 (b): Front din yaw și pitch (secțiunea 5.2), apoi Right și Up prin produse vectoriale.
         float yaw = MathHelper.DegreesToRadians(Yaw);
         float pitch = MathHelper.DegreesToRadians(Pitch);
 
