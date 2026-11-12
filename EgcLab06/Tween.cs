@@ -51,7 +51,8 @@ public sealed class Tween
         get
         {
             // TODO 6.2 (b): Vector3.Lerp(From, To, ...), cu Ease aplicat pe Progress
-            return From;   // provizoriu: obiectul stă pe loc
+            //return From;   // provizoriu: obiectul stă pe loc
+            return Vector3.Lerp(From, To, Ease(Progress));
         }
 
     }
