@@ -47,6 +47,17 @@ public sealed class KeyframeTrack
         //   1. position = time / SecondsPerKey, adus în [0, Count) cu %   (de exemplu 1.5)
         //   2. i = partea întreagă (cheia de plecare), u = partea fracționară (cât din drum)
         //   3. Lerp între cheia i și cheia următoare ((i + 1) % Count), cu Ease aplicat pe u
-        return _keys[0];   // provizoriu: pista stă la prima cheie
+       
+        // 1. câte intervale au trecut, adus în [0, Count) (bucla)
+        float position = (time / SecondsPerKey) % _keys.Count;
+        if (position < 0.0f) position += _keys.Count;
+
+        // 2. cheia de plecare (partea întreagă) și cât din drum s-a parcurs (partea fracționară)
+        int i = (int)MathF.Floor(position);
+        float u = position - i;
+
+        // 3. lerp între cheia i și cheia următoare, cu easing pe u
+        Vector3 next = _keys[(i + 1) % _keys.Count];
+        return Vector3.Lerp(_keys[i], next, Ease(u));
     }
 }
