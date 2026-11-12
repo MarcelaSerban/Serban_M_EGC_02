@@ -118,6 +118,19 @@ public class FpsCamera : Camera
     }
 
     /// <summary>
+    /// Așază camera în <paramref name="position"/>, cu privirea spre <paramref name="front"/>
+    /// (yaw și pitch din formulele inverse). Folosită la comutarea de la camera orbită (bonus).
+    /// </summary>
+    public void PlaceAt(Vector3 position, Vector3 front)
+    {
+        front.Normalize();
+        _position = position;
+        Pitch = Math.Clamp(MathHelper.RadiansToDegrees(MathF.Asin(front.Y)), -MaxPitch, MaxPitch);
+        Yaw = MathHelper.RadiansToDegrees(MathF.Atan2(front.Z, front.X));
+        UpdateVectors();
+    }
+
+    /// <summary>
     /// Recalculează baza camerei din yaw și pitch (unghiuri Euler -> vector de direcție).
     /// </summary>
     private void UpdateVectors()
