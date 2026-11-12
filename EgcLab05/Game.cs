@@ -24,7 +24,7 @@ public class Game : GameWindow
     private readonly List<SceneObject> _scene = new();
 
     // Starea de desenare (comutată de la tastatură).
-    private bool _depthTest;           // tasta Z (după TODO 5.2 îl puteți porni de la început: = true)
+    private bool _depthTest = true;    // tasta Z
     private bool _faceCulling;         // tasta C
     private bool _wireframe;           // tasta F
 
@@ -260,7 +260,7 @@ public class Game : GameWindow
         // 1. Ștergem imaginea veche: bufferul de culoare și bufferul de adâncime.
         GL.ClearColor(0.12f, 0.14f, 0.18f, 1.0f);
         // TODO 5.2: ștergerea bufferului de adâncime la fiecare cadru
-        GL.Clear(ClearBufferMask.ColorBufferBit);
+        GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
         // 2. Starea de rasterizare.
         SetCapability(EnableCap.DepthTest, _depthTest);   // fragmentul mai apropiat câștigă
