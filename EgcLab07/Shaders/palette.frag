@@ -18,9 +18,9 @@ out vec4 FragColor;
 
 vec3 palette(float t)
 {
-   // TODO 7.6 (a): culoare(t) = a + b * cos(2 * pi * (c * t + d)), pe toate cele trei canale deodata
-   //               (operatiile GLSL cu vec3 se fac pe componente).
-   return vec3(0.35);
+    // TODO 7.6 (a): culoare(t) = a + b * cos(2 * pi * (c * t + d)), pe toate cele trei canale deodata
+    // (operatiile GLSL cu vec3 se fac pe componente).
+    return uA + uB * cos(6.2831853 * (uC * t + uD));
 }
 
 void main()
@@ -31,8 +31,8 @@ void main()
         return;
     }
 
-   // TODO 7.6 (b): t creste de la polul sud la polul nord (vUV.y * uRepeat) si curge in timp (uTime * uSpeed).
-   float t = vUV.y;
+    // TODO 7.6 (b): t creste de la polul sud la polul nord (vUV.y * uRepeat) si curge in timp (uTime * uSpeed).
+    float t = vUV.y * uRepeat + uTime * uSpeed;
     vec3 color = palette(t);
     FragColor = vec4(color * vColor, 1.0);
 }
