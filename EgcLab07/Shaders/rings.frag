@@ -28,13 +28,14 @@ void main()
     // Distanta fragmentului fata de centrul discului (0 in centru, ~0.5 la marginea panoului).
     float d = distance(vUV, uCenter);
 
-   // TODO 7.5 (a): discul (sectiunea 6.2). inside = 1 in interior, 0 in afara.
-   //   Incercati intai marginea "dura":   float inside = step(d, uRadius);
-   //   apoi marginea neteda:              1.0 - smoothstep(uRadius - uSoftness, uRadius + uSoftness, d)
-   float inside = 0.0;
-   // TODO 7.5 (b): undele (sectiunea 6.3): o sinusoida a distantei, deplasata in timp, adusa in [0, 1]:
-   //   0.5 + 0.5 * sin(6.2831853 * (d * uFrequency - uTime * uSpeed * 0.25))
-   float wave = 1.0;
+    // TODO 7.5 (a): discul (sectiunea 6.2). inside = 1 in interior, 0 in afara.
+    // Varianta 1, margine "dura" (cu trepte): float inside = step(d, uRadius);
+    // Varianta 2, margine neteda: smoothstep trece lin de la 0 la 1 pe latimea 2 * uSoftness.
+    float inside = 1.0 - smoothstep(uRadius - uSoftness, uRadius + uSoftness, d);
+
+    // TODO 7.5 (b): undele (sectiunea 6.3): o sinusoida a distantei, deplasata in timp,
+    // adusa din [-1, 1] in [0, 1]. Cu "- uTime" crestele se departeaza de centru.
+    float wave = 0.5 + 0.5 * sin(6.2831853 * (d * uFrequency - uTime * uSpeed * 0.25));
 
     vec3 ringColor = mix(uColorInside * 0.35, uColorInside, wave);
     vec3 color = mix(uColorOutside, ringColor, inside);
